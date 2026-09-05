@@ -5,7 +5,7 @@
 ### Production-Grade Skills, Guardrails & Workflows for Antigravity, Claude, Jules, Cursor & AI Engineers
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Skills Count](https://img.shields.io/badge/Skills-18%20Available-brightgreen.svg)](#master-skills-catalog)
+[![Skills Count](https://img.shields.io/badge/Skills-20%20Available-brightgreen.svg)](#master-skills-catalog)
 [![Agent Runtimes](https://img.shields.io/badge/Compatible-Antigravity%20%7C%20Claude%20%7C%20Jules%20%7C%20Cursor-purple.svg)](#)
 [![Validation CI](https://img.shields.io/badge/CI-Validated-success.svg)](.github/workflows/validate.yml)
 [![Sync Engine](https://img.shields.io/badge/Sync%20Engine-Bi--Directional-orange.svg)](#cross-repository-synchronization-engine)
@@ -42,7 +42,7 @@
 
 When building applications with AI coding agents (such as Google Antigravity, Google Jules CLI, Claude Code, or Cursor), standard prompts frequently suffer from context drift, forgotten pre-commit checks, fragmented branch management, and conversational filler.
 
-This repository provides **18 modular, tested agent skills** following the open **`SKILL.md` specification**. Each skill defines:
+This repository provides **20 modular, tested agent skills** following the open **`SKILL.md` specification**. Each skill defines:
 1. **Trigger Semantics**: YAML frontmatter describing precise activation conditions.
 2. **Explicit Safety Directives**: Alerts (`[!IMPORTANT]`, `[!WARNING]`) enforcing non-negotiable boundaries.
 3. **Deterministic Runbooks**: Shell-verified commands and code recipes.
@@ -57,11 +57,11 @@ All skills are maintained centrally in this repository (**Hub**). Downstream dev
 ```mermaid
 flowchart TD
     subgraph Hub["Central Hub: MishraShardendu22/agent-skills"]
-        MasterSkills[".agents/skills/ (18 Modular Skills)"]
+        MasterSkills[".agents/skills/ (20 Modular Skills)"]
         Validator["CI Schema Validator (validate-skills.py)"]
     end
 
-    subgraph Repo1["Project: github-backup-automation-system"]
+    subgraph Repo1["Project: Polyglot-App-Service"]
         P1Skills[".agents/skills/"]
     end
 
@@ -136,6 +136,7 @@ This populates `.agents/skills/` with the entire catalog.
 | `docker-first-architecture` | Enforces multi-stage production Dockerfiles, optimal toolchains (pnpm, uv, static Go), and Docker Hub automation. | [`.agents/skills/docker-first-architecture`](.agents/skills/docker-first-architecture/SKILL.md) |
 | `ci-cd-workflow` | Multi-environment CI/CD workflows, Docker Hub publishing, Render & Vercel deployments. | [`.agents/skills/ci-cd-workflow`](.agents/skills/ci-cd-workflow/SKILL.md) |
 | `cli-tooling-guide` | Standard operating guide for authenticated CLI tools (`gh`, `jules`, `vercel`, `neonctl`, `docker`). | [`.agents/skills/cli-tooling-guide`](.agents/skills/cli-tooling-guide/SKILL.md) |
+| `modern-toolchain-standard` | Standard operating specification: mandatory pnpm over npm, mandatory uv over bare pip, Biome, and Vitest. | [`.agents/skills/modern-toolchain-standard`](.agents/skills/modern-toolchain-standard/SKILL.md) |
 | `precommit-workflow-management` | Maintain, configure, and execute intelligent multi-language pre-commit hook suites. | [`.agents/skills/precommit-workflow-management`](.agents/skills/precommit-workflow-management/SKILL.md) |
 
 ### 5. Code Quality, Testing & Simplification
@@ -152,7 +153,7 @@ This populates `.agents/skills/` with the entire catalog.
 | Skill | Description | Direct Link |
 | :--- | :--- | :--- |
 | `saas-and-mcp-architecture` | SaaS Connector Hub, encrypted secret vaults, cloud storage, and MCP tool expansions. | [`.agents/skills/saas-and-mcp-architecture`](.agents/skills/saas-and-mcp-architecture/SKILL.md) |
-| `github-backup-architecture` | Multi-service architecture, pgvector hybrid search, and cloud deployment boundaries. | [`.agents/skills/github-backup-architecture`](.agents/skills/github-backup-architecture/SKILL.md) |
+| `polyglot-microservice-architecture` | Polyglot architecture guidelines, service boundaries, pgvector hybrid search, and cloud deployments. | [`.agents/skills/polyglot-microservice-architecture`](.agents/skills/polyglot-microservice-architecture/SKILL.md) |
 
 ---
 

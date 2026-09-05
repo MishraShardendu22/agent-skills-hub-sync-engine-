@@ -56,7 +56,7 @@ To prevent duplication and fragmentation across multiple distinct codebases, `ag
 graph TD
     Hub[Central Hub: MishraShardendu22/agent-skills]
     
-    RepoA[Repo: github-backup-automation-system]
+    RepoA[Repo: Polyglot-App-Service]
     RepoB[Repo: AI-Resume-Analyser]
     RepoC[Repo: NextJS-Production-App]
 
