@@ -21,3 +21,7 @@ The shared visual language for the MishraShardendu22 product ecosystem:
    - Body: `Inter` / `IBM Plex Sans` (`1.6` line height).
    - Monospace: `IBM Plex Mono` for kickers, metric readouts, and telemetry.
 4. **Hairline Precision**: 1px borders (`#343431`) carry structure; avoid heavy drop shadows.
+5. **Anchored Interaction (Zero Hover Levitation)**:
+   - Elements must NEVER move up on hover (`translateY`, `hover:-translate-y-*`, float, or bounce).
+   - Interactive cards, buttons, metrics, and links must remain physically grounded and stationary in the DOM.
+   - Hover feedback must strictly rely on hairline border color shifts, surface overlays (`var(--surface-overlay)`), or subtle opacity transitions.

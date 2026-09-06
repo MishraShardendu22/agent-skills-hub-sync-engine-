@@ -41,7 +41,7 @@
   border-top: 2px solid var(--iris-500);
 }
 
-/* Interactive cards get a hairline lift, not a drop shadow. */
+/* Interactive cards must remain grounded with zero vertical displacement. */
 .m-card--interactive {
   cursor: pointer;
 }
@@ -50,7 +50,6 @@
 .m-card--interactive:focus-within {
   border-color: var(--line-accent);
   background: var(--surface-overlay);
-  transform: translateY(-2px);
 }
 
 .m-panel {
@@ -100,14 +99,11 @@
   padding: var(--space-5);
   min-width: 0;
   height: 100%;
-  transition:
-    border-color var(--dur-base) var(--ease-standard),
-    transform var(--dur-base) var(--ease-out);
+  transition: border-color var(--dur-base) var(--ease-standard);
 }
 
 .m-metric:hover {
   border-color: var(--line-accent);
-  transform: translateY(-2px);
 }
 
 .m-metric__label {
