@@ -1,22 +1,20 @@
 ---
 name: agent-observatory-workflow
 description: >-
-  Step-by-step instructions for building and extending Python AI agent services: adding LangChain/LiteLLM tools,
-  Tool-Calling RAG workflows, enforcing Human-in-the-Loop approvals, multi-key model failover, and pgvector embeddings.
+  Step-by-step instructions for extending the Python AI Observatory agent: adding LangChain tools,
+  Tool-Calling RAG workflows, enforcing Human-in-the-Loop approvals, multi-key OpenRouter failover, and pgvector embeddings.
 ---
 
-# Agent Observatory & Tool-Calling RAG Workflow Guide
+# Agent Observatory Workflow & Extension Guide
 
-This skill guides agents and engineers on how to build, extend, test, and enhance AI agent services utilizing Tool-Calling RAG, LangChain/LiteLLM architectures, and pgvector embeddings.
+This skill guides agents and engineers on how to safely build, modify, test, and enhance AI agent features within `agentic-observatory/`.
 
----
-
-## 1. Local Branch-First Development
+## 1. Branch-First Development
 
 > [!IMPORTANT]
-> **CREATE A LOCAL BRANCH FIRST**: Always start by creating a dedicated local branch from `main`:
+> **CREATE A LOCAL BRANCH FIRST**: Always start by creating a local branch from `main`:
 > ```bash
-> git switch -c <developer-or-agent>/main/<feature-name>
+> git switch -c MishraShardendu22/main/<feature-name>
 > ```
 > Never develop or modify agent code directly on `main`.
 
@@ -24,7 +22,7 @@ This skill guides agents and engineers on how to build, extend, test, and enhanc
 
 ## 2. Adding a New Agent Tool
 
-1. Create or update a tool file under your agent tools directory (e.g. `agent/tools/` or `data/tools/`):
+1. Create or update a tool file under [`agentic-observatory/data/tools/`](file:///home/ms22/Coding_stuff/Personal-Projects/github-backup-automation-system/agentic-observatory/data/tools/):
    ```python
    from typing import Annotated, Any
    from langchain_core.tools import tool
@@ -34,34 +32,35 @@ This skill guides agents and engineers on how to build, extend, test, and enhanc
        metric_name: Annotated[str, "The name of the metric to query"],
        days: Annotated[int, "Number of lookback days"] = 7,
    ) -> dict[str, Any]:
-       """Query operational metrics from the database or external API."""
+       """Query custom operational metrics from the database."""
        # Perform database query or API call
        return {"metric": metric_name, "value": 42}
    ```
-2. Export the tool in the tools package `__init__.py`.
-3. Register the tool in your central agent runner's `TOOLS` list.
+2. Export the tool in [`agentic-observatory/data/tools/__init__.py`](file:///home/ms22/Coding_stuff/Personal-Projects/github-backup-automation-system/agentic-observatory/data/tools/__init__.py).
+3. Add the tool to the `TOOLS` list in [`agentic-observatory/agent/openrouter.py`](file:///home/ms22/Coding_stuff/Personal-Projects/github-backup-automation-system/agentic-observatory/agent/openrouter.py).
 
 ---
 
-## 3. Tool-Calling RAG & Vector Knowledge Base
+## 2. Tool-Calling RAG & Vector Knowledge Base
 
-The AI service operates as a **Tool-Calling RAG Agent**:
+The AI Observatory operates as a **Tool-Calling RAG Agent**:
 1. **Pre-turn Retrieval**: Injects top relevance chunks into system context before iteration 1.
 2. **Dynamic Tool Calling**: The agent calls `hybrid_search_knowledge_base` during reasoning loops for deep evidence gathering:
    ```python
-   from agent.tools import hybrid_search_knowledge_base
+   # Inside agent/openrouter.py:
+   from data.tools import hybrid_search_knowledge_base
    ```
-   * Supported source filters: `['chat_message', 'execution_log', 'investigation', 'task_result', 'incident_fix']`.
+   * Supported source filters: `['chat_message', 'execution_log', 'investigation', 'backup_result', 'backup_fix']`.
    * Combines Full-Text Search (tsvector), pgvector cosine similarity, and Reciprocal Rank Fusion (RRF).
 
 ---
 
-## 4. Implementing Human-In-The-Loop (HITL) Actions
+## 3. Implementing Human-In-The-Loop (HITL) Actions
 
-For sensitive or destructive actions (e.g., dispatching external emails, modifying records, triggering external deployments):
-1. In the agent reasoning execution loop, intercept the tool call prior to execution:
+For sensitive actions (e.g., sending emails, applying hotfixes, modifying DB records):
+1. In `agentic-observatory/agent/openrouter.py`, intercept the tool before execution:
    ```python
-   if tool_name in SENSITIVE_ACTION_TOOLS:
+   if tool_name == "send_report_email":
        confirm_id = str(uuid.uuid4())
        confirm_event = asyncio.Event()
        active_confirmations[confirm_id] = confirm_event
@@ -72,25 +71,25 @@ For sensitive or destructive actions (e.g., dispatching external emails, modifyi
            "name": tool_name,
            "args": tool_args,
        })
-       # Await user confirmation or timeout
+       # Wait up to 120s for user response via /chat/confirm
        await asyncio.wait_for(confirm_event.wait(), timeout=120.0)
    ```
-2. Feed the user approval or rejection payload back to the LLM context to continue execution safely.
+2. Feed the user approval or rejection back to the LLM context.
 
 ---
 
-## 5. Multi-Key API Failover
+## 4. Working with Multi-Key OpenRouter Failover
 
-When interacting with external LLM APIs (e.g. OpenRouter, OpenAI, Anthropic):
-- Maintain an in-memory pool of configured API keys.
-- On HTTP `401`, `402`, or `429` (rate limit/quota exhaustion), rotate to the next backup key with exponential backoff and jitter.
-- Track latency and failure counts per key to optimize routing.
+Always use [`agentic-observatory/utils/openrouter_keys.py`](file:///home/ms22/Coding_stuff/Personal-Projects/github-backup-automation-system/agentic-observatory/utils/openrouter_keys.py):
+* `get_openrouter_api_keys()`: Returns all configured keys.
+* `get_active_openrouter_key()`: Returns the currently active working key.
+* `rotate_openrouter_key(failed_key, reason)`: Advances to the next backup key when an error (`401`, `402`, `429`) occurs.
 
 ---
 
-## 6. Comprehensive Agent Test Suites
+## 5. Comprehensive Agent Test Suites
 
-Execute verification test suites:
+Run the test suite commands:
 ```bash
 # 1. Run all unit and integration tests across the system
 make test
@@ -98,6 +97,6 @@ make test
 # 2. Run dedicated AI Agent & Tool-Calling RAG test suite
 make test-agents
 
-# 3. Direct execution of agent evaluation tests
-uv run python -m unittest discover -s tests -p "test_agent*.py"
+# 3. Direct execution of Agent tests
+cd agentic-observatory && uv run python test_agent_suite.py
 ```

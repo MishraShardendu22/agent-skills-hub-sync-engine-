@@ -7,16 +7,14 @@ description: >-
 
 # Repository Maintenance Skill
 
-This skill provides procedures for maintaining database integrity, executing database backups, applying schema migrations, and managing dependencies across repositories.
+This skill provides procedures for maintaining database integrity, executing database backups, applying schema migrations, and managing dependencies across the **GitHub Backup Automation System**.
 
----
-
-## 1. Local Branch-First Development
+## 1. Branch-First Development
 
 > [!IMPORTANT]
-> **CREATE A LOCAL BRANCH FIRST**: Always start by creating a dedicated local branch from `main`:
+> **CREATE A LOCAL BRANCH FIRST**: Always start by creating a local branch from `main`:
 > ```bash
-> git switch -c <developer-or-agent>/main/<feature-name>
+> git switch -c MishraShardendu22/main/<feature-name>
 > ```
 > Never apply maintenance or schema changes directly on `main`.
 
@@ -25,33 +23,34 @@ This skill provides procedures for maintaining database integrity, executing dat
 ## 2. Database Schema Integrity & Migrations
 
 > [!CAUTION]
-> **CRITICAL RULE**: Never execute destructive SQL statements (`DROP TABLE`, `TRUNCATE`) in production environments.
+> **CRITICAL RULE**: Never execute destructive SQL statements (`DROP TABLE`, `TRUNCATE`). Production data has historical backup logs spanning months.
 
 ### Migration Rules
-- All migrations MUST be located in a versioned migrations directory (e.g. `db/migrations/` or `migrations/`) using timestamped or numbered files (`NNNNNN_<name>.up.sql` and `NNNNNN_<name>.down.sql`).
-- All SQL statements MUST be idempotent:
-  - `CREATE TABLE IF NOT EXISTS ...`
-  - `CREATE INDEX IF NOT EXISTS ...`
-  - `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...`
+* All migrations MUST be located in `backend/db/migrations/` using versioned naming `NNNNNN_<name>.up.sql` and `NNNNNN_<name>.down.sql`.
+* All SQL statements MUST be idempotent:
+  * `CREATE TABLE IF NOT EXISTS ...`
+  * `CREATE INDEX IF NOT EXISTS ...`
+  * `ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...`
+* Schema migrations are orchestrated exclusively by Go backend startup (`backend/db/migrator.go`).
 
 ---
 
-## 3. Backup & Disaster Recovery Runbook
+## 2. Backup & Disaster Recovery Runbook
 
-PostgreSQL database dumps should be automated with SHA-256 integrity verification:
+PostgreSQL database dumps are automated with SHA-256 integrity verification:
 
 ```bash
-# 1. Execute an automated database backup
+# 1. Execute an automated database backup (stored in backups/postgres/ with 14-day retention)
 make backup-db
 
 # 2. Restore database from a backup file
-make restore-db BACKUP_FILE=backups/postgres/db_backup_YYYYMMDD_HHMMSS.sql.gz
+make restore-db BACKUP_FILE=backups/postgres/gbm_pg_backup_YYYYMMDD_HHMMSS.sql.gz
 ```
 
 ---
 
-## 4. Dependency Management
+## 3. Dependency Management
 
-- **Go Dependencies**: Managed via `go.mod`. Update with `go get -u` and clean with `go mod tidy`.
-- **Python Dependencies**: Managed via `uv`. Update with `uv lock --upgrade` and sync with `uv sync`.
-- **Frontend Dependencies**: Managed via `pnpm`. Update with `pnpm update`. Ensure lockfiles remain frozen in CI.
+* **Go Dependencies**: Managed via `go.mod`. Update with `go get -u` and clean with `go mod tidy`.
+* **Python Observatory**: Managed via `uv` in `agentic-observatory/`. Update with `uv lock --upgrade` and sync with `uv sync`.
+* **Frontend Dashboard**: Managed via `pnpm` in `frontend/`. Update with `pnpm update`. Ensure native modules like `sharp` and `@biomejs/biome` remain authorized in `frontend/pnpm-workspace.yaml`.
